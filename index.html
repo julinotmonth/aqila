@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SP-PAROK: Sistem Pakar Penyakit Rokok</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: #e74c3c;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #3498db;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #2c3e50;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .hero-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-image {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+        }
+
+        .lung-comparison {
+            text-align: center;
+        }
+
+        .lung-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .healthy { color: #27ae60; }
+        .damaged { color: #e74c3c; }
+
+        /* Statistics */
+        .stats {
+            background: #f8f9fa;
+            padding: 80px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 3rem;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Forms */
+        .form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .checkbox-item:hover {
+            background: #e9ecef;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        /* Results */
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .probability {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .recommendations {
+            background: white;
+            color: #333;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        /* Admin Dashboard */
+        .admin-sidebar {
+            position: fixed;
+            left: -250px;
+            top: 80px;
+            width: 250px;
+            height: calc(100vh - 80px);
+            background: #2c3e50;
+            color: white;
+            transition: left 0.3s;
+            z-index: 999;
+        }
+
+        .admin-sidebar.active {
+            left: 0;
+        }
+
+        .admin-content {
+            margin-left: 0;
+            padding: 2rem;
+            transition: margin-left 0.3s;
+        }
+
+        .admin-content.sidebar-active {
+            margin-left: 250px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu li a:hover {
+            background: #34495e;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .dashboard-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #2c3e50;
+            color: white;
+        }
+
+        /* Articles */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .article-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .article-content {
+            padding: 2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .hero-content h2 {
+                font-size: 2rem;
+            }
+
+            .hero-image {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #3498db; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-lungs"></i>
+                    <h1>SP-PAROK</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" onclick="showPage('home')">Beranda</a></li>
+                        <li><a href="#" onclick="showPage('about')">Tentang</a></li>
+                        <li><a href="#" onclick="showPage('articles')">Artikel</a></li>
+                        <li><a href="#" onclick="showPage('faq')">FAQ</a></li>
+                        <li><a href="#" onclick="showPage('contact')">Kontak</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons" id="authButtons">
+                    <a href="#" class="btn btn-outline" onclick="showPage('login')">Login</a>
+                    <a href="#" class="btn btn-primary" onclick="showPage('register')">Daftar</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;">
+                    <span id="userName">User</span>
+                    <button class="btn btn-primary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HOME PAGE -->
+        <div id="home" class="page active">
+            <section class="hero">
+                <div class="container">
+                    <div class="hero-content">
+                        <h2>Sistem Pakar Deteksi Penyakit Rokok</h2>
+                        <p>Deteksi dini penyakit akibat merokok dengan teknologi sistem pakar berbasis rule-based dan forward chaining. Lindungi kesehatan Anda sebelum terlambat.</p>
+                        
+                        <div class="hero-image">
+                            <div class="lung-comparison">
+                                <div class="lung-icon healthy">
+                                    <i class="fas fa-lungs"></i>
+                                </div>
+                                <h4>Paru-paru Sehat</h4>
+                            </div>
+                            <div class="lung-comparison">
+                                <div class="lung-icon damaged">
+                                    <i class="fas fa-lungs"></i>
+                                </div>
+                                <h4>Paru-paru Perokok</h4>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="startConsultation()">Mulai Konsultasi Sekarang</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem; color: #2c3e50;">Fakta Tentang Bahaya Rokok</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-skull-crossbones"></i>
+                            <h3>8 Juta</h3>
+                            <p>Kematian per tahun akibat rokok di dunia</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-lungs"></i>
+                            <h3>90%</h3>
+                            <p>Kanker paru-paru disebabkan oleh rokok</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-heart-broken"></i>
+                            <h3>25%</h3>
+                            <p>Peningkatan risiko penyakit jantung</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <h3>10 Tahun</h3>
+                            <p>Pengurangan usia harapan hidup</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ABOUT PAGE -->
+        <div id="about" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem;">Tentang SP-PAROK</h2>
+                    <div class="form-container">
+                        <h3>Sistem Pakar Deteksi Penyakit Rokok</h3>
+                        <p>SP-PAROK adalah sistem pakar berbasis web yang dirancang untuk membantu deteksi dini penyakit-penyakit yang disebabkan oleh kebiasaan merokok.</p>
+                        
+                        <h4>Metode yang Digunakan</h4>
+                        <ul>
+                            <li><strong>Forward Chaining:</strong> Sistem mulai dari fakta (gejala) untuk mencapai kesimpulan (diagnosa)</li>
+                            <li><strong>Rule-Based System:</strong> Menggunakan aturan IF-THEN untuk proses inferensi</li>
+                            <li><strong>Expert Knowledge:</strong> Berdasarkan pengetahuan medis dari para ahli</li>
+                        </ul>
+                        
+                        <h4>Manfaat untuk Masyarakat</h4>
+                        <ul>
+                            <li>Deteksi dini penyakit akibat rokok</li>
+                            <li>Edukasi tentang bahaya merokok</li>
+                            <li>Konsultasi awal sebelum ke dokter</li>
+                            <li>Meningkatkan kesadaran kesehatan</li>
+                        </ul>
+                        
+                        <div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-top: 2rem;">
+                            <strong>Disclaimer:</strong> Sistem ini hanya untuk deteksi awal dan tidak menggantikan konsultasi dengan dokter. Selalu konsultasikan dengan tenaga medis profesional untuk diagnosis yang akurat.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- LOGIN PAGE -->
+        <div id="login" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <div class="form-container">
+                        <h2 style="text-align: center; margin-bottom: 2rem;">Login</h2>
+                        <form id="loginForm" onsubmit="handleLogin(event)">
+                            <div class="form-group">
+                                <label for="loginEmail">Email</label>
+                                <input type="email" id="loginEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Password</label>
+                                <input type="password" id="loginPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                            </div>
+                            <div style="text-align: center; margin-top: 1rem;">
+                                <p>Belum punya akun? <a href="#" onclick="showPage('register')">Daftar sekarang</a></p>
+                                <p><a href="#" onclick="showForgotPassword()">Lupa password?</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- REGISTER PAGE -->
+        <div id="register" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <div class="form-container">
+                        <h2 style="text-align: center; margin-bottom: 2rem;">Registrasi</h2>
+                        <form id="registerForm" onsubmit="handleRegister(event)">
+                            <div class="form-group">
+                                <label for="fullName">Nama Lengkap</label>
+                                <input type="text" id="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="age">Usia</label>
+                                <input type="number" id="age" min="1" max="120" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Jenis Kelamin</label>
+                                <select id="gender" required>
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="pria">Pria</option>
+                                    <option value="wanita">Wanita</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Daftar</button>
+                            </div>
+                            <div style="text-align: center; margin-top: 1rem;">
+                                <p>Sudah punya akun? <a href="#" onclick="showPage('login')">Login sekarang</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- CONSULTATION PAGE -->
+        <div id="consultation" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem;">Konsultasi Gejala</h2>
+                    
+                    <div class="form-container">
+                        <h3>Data Diri</h3>
+                        <form id="consultationForm" onsubmit="handleConsultation(event)">
+                            <div class="form-group">
+                                <label for="consultName">Nama Lengkap</label>
+                                <input type="text" id="consultName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="consultAge">Usia</label>
+                                <input type="number" id="consultAge" min="1" max="120" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="smokingDuration">Lama Merokok (tahun)</label>
+                                <input type="number" id="smokingDuration" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="cigarettesPerDay">Jumlah Rokok per Hari (batang)</label>
+                                <input type="number" id="cigarettesPerDay" min="0" max="100">
+                            </div>
+                            
+                            <h3 style="margin-top: 2rem;">Pilih Gejala yang Anda Alami</h3>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="cough" name="symptoms" value="Batuk kronis">
+                                    <label for="cough">Batuk kronis (lebih dari 3 minggu)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="breathless" name="symptoms" value="Sesak napas">
+                                    <label for="breathless">Sesak napas</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="chestPain" name="symptoms" value="Nyeri dada">
+                                    <label for="chestPain">Nyeri dada</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="fatigue" name="symptoms" value="Mudah lelah">
+                                    <label for="fatigue">Mudah lelah</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="infection" name="symptoms" value="Sering infeksi paru">
+                                    <label for="infection">Sering infeksi paru</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="weightLoss" name="symptoms" value="Berat badan turun">
+                                    <label for="weightLoss">Berat badan turun tanpa sebab</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="bloodCough" name="symptoms" value="Batuk darah">
+                                    <label for="bloodCough">Batuk darah</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="wheezing" name="symptoms" value="Nafas berbunyi">
+                                    <label for="wheezing">Nafas berbunyi (wheezing)</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="margin-top: 2rem;">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Proses Analisis</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- RESULTS PAGE -->
+        <div id="results" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem;">Hasil Konsultasi</h2>
+                    
+                    <div class="result-card">
+                        <div class="result-header">
+                            <h3 id="resultName">Nama Pasien</h3>
+                            <p id="resultDate">Tanggal Konsultasi</p>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <h4>Hasil Analisis</h4>
+                            <div class="probability" id="resultProbability">75%</div>
+                            <h3 id="resultDisease">Bronkitis Kronis</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendations">
+                        <h4>Rekomendasi</h4>
+                        <div id="recommendationList">
+                            <ul>
+                                <li>Segera hentikan kebiasaan merokok</li>
+                                <li>Konsultasikan dengan dokter spesialis paru</li>
+                                <li>Hindari asap rokok dan polusi udara</li>
+                                <li>Perbanyak konsumsi air putih</li>
+                                <li>Olahraga ringan secara teratur</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; text-align: center;">
+                            <button class="btn btn-primary" onclick="printResult()">
+                                <i class="fas fa-print"></i> Cetak Hasil (PDF)
+                            </button>
+                            <button class="btn btn-outline" onclick="saveToHistory()" style="margin-left: 1rem;">
+                                <i class="fas fa-save"></i> Simpan ke Riwayat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- HISTORY PAGE -->
+        <div id="history" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem;">Riwayat Konsultasi</h2>
+                    
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="dateFilter">Filter berdasarkan tanggal:</label>
+                            <input type="date" id="dateFilter" onchange="filterHistory()">
+                        </div>
+                        
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Diagnosa</th>
+                                    <th>Probabilitas</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTable">
+                                <tr>
+                                    <td>2024-12-15</td>
+                                    <td>Bronkitis Kronis</td>
+                                    <td>75%</td>
+                                    <td>
+                                        <button class="btn btn-primary" onclick="viewResult(1)">Lihat</button>
+                                        <button class="btn btn-outline" onclick="downloadResult(1)">Download</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ARTICLES PAGE -->
+        <div id="articles" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem;">Artikel & Edukasi</h2>
+                    
+                    <div class="articles-grid">
+                        <div class="article-card">
+                            <div class="article-content">
+                                <h4>Bahaya Rokok bagi Kesehatan</h4>
+                                <p>Merokok dapat menyebabkan berbagai penyakit serius seperti kanker paru, penyakit jantung, dan stroke...</p>
+                                <small>Kategori: Edukasi | 15 Des 2024</small>
+                            </div>
+                        </div>
+                        
+                        <div class="article-card">
+                            <div class="article-content">
+                                <h4>Tips Efektif Berhenti Merokok</h4>
+                                <p>Berhenti merokok memang sulit, namun dengan strategi yang tepat, Anda bisa berhasil. Berikut tips-tipsnya...</p>
+                                <small>Kategori: Pencegahan | 14 Des 2024</small>
+                            </div>
+                        </div>
+                        
+                        <div class="article-card">
+                            <div class="article-content">
+                                <h4>PPOK: Penyakit Paru Obstruktif Kronis</h4>
+                                <p>PPOK adalah penyakit paru-paru yang menghalangi aliran udara dan menyulitkan pernapasan...</p>
+                                <small>Kategori: Berita Medis | 13 Des 2024</small>
+                            </div>
+                        </div>
+                        
+                        <div class="article-card">
+                            <div class="article-content">
+                                <h4>Kanker Paru: Deteksi Dini dan Pencegahan</h4>
+                                <p>Kanker paru adalah salah satu penyakit paling mematikan akibat rokok. Kenali gejala awalnya...</p>
+                                <small>Kategori: Edukasi | 12 Des 2024</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- FAQ PAGE -->
+        <div id="faq" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem;">FAQ & Bantuan</h2>
+                    
+                    <div class="form-container">
+                        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; border-radius: 8px; background: #f8f9fa;">
+                            <h4>Apakah sistem ini menggantikan konsultasi dengan dokter?</h4>
+                            <p>Tidak. Sistem pakar ini hanya membantu deteksi awal dan edukasi. Untuk diagnosis yang akurat dan pengobatan, Anda tetap perlu berkonsultasi dengan dokter atau tenaga medis profesional.</p>
+                        </div>
+                        
+                        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; border-radius: 8px; background: #f8f9fa;">
+                            <h4>Seberapa akurat hasil diagnosis sistem ini?</h4>
+                            <p>Sistem ini berdasarkan pengetahuan medis dan aturan yang telah ditetapkan oleh ahli. Namun, akurasi dapat bervariasi tergantung pada kelengkapan gejala yang diinput dan kondisi individual.</p>
+                        </div>
+                        
+                        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; border-radius: 8px; background: #f8f9fa;">
+                            <h4>Apakah data pribadi saya aman?</h4>
+                            <p>Ya, kami menjaga kerahasiaan data pribadi Anda sesuai dengan peraturan yang berlaku. Data hanya digunakan untuk keperluan konsultasi dan tidak akan dibagikan kepada pihak ketiga.</p>
+                        </div>
+                        
+                        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; border-radius: 8px; background: #f8f9fa;">
+                            <h4>Bisakah sistem ini mendeteksi semua penyakit akibat rokok?</h4>
+                            <p>Sistem ini dirancang untuk mendeteksi penyakit-penyakit utama akibat rokok seperti bronkitis, PPOK, dan kanker paru. Namun, masih ada penyakit lain yang mungkin tidak tercakup.</p>
+                        </div>
+                        
+                        <div class="faq-item" style="margin-bottom: 2rem; padding: 1rem; border-radius: 8px; background: #f8f9fa;">
+                            <h4>Bagaimana cara mendapatkan bantuan jika mengalami masalah?</h4>
+                            <p>Anda bisa menghubungi kami melalui halaman kontak atau kirim email ke support@sp-parok.com</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- CONTACT PAGE -->
+        <div id="contact" class="page">
+            <section style="padding: 80px 0;">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: 3rem;">Kontak Kami</h2>
+                    
+                    <div class="form-container">
+                        <form id="contactForm" onsubmit="handleContact(event)">
+                            <div class="form-group">
+                                <label for="contactName">Nama</label>
+                                <input type="text" id="contactName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail">Email</label>
+                                <input type="email" id="contactEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactMessage">Pesan</label>
+                                <textarea id="contactMessage" rows="5" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Kirim Pesan</button>
+                            </div>
+                        </form>
+                        
+                        <div style="margin-top: 2rem; text-align: center; padding-top: 2rem; border-top: 1px solid #eee;">
+                            <h4>Informasi Kontak</h4>
+                            <p><strong>Tim Pengembang SP-PAROK</strong></p>
+                            <p><i class="fas fa-envelope"></i> support@sp-parok.com</p>
+                            <p><i class="fas fa-phone"></i> (021) 1234-5678</p>
+                            <p><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="admin" class="page">
+            <div class="admin-sidebar" id="adminSidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="#" onclick="showAdminPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="showAdminPage('users')"><i class="fas fa-users"></i> Manajemen User</a></li>
+                    <li><a href="#" onclick="showAdminPage('symptoms')"><i class="fas fa-list"></i> Data Gejala</a></li>
+                    <li><a href="#" onclick="showAdminPage('diseases')"><i class="fas fa-virus"></i> Data Penyakit</a></li>
+                    <li><a href="#" onclick="showAdminPage('rules')"><i class="fas fa-brain"></i> Basis Aturan</a></li>
+                    <li><a href="#" onclick="showAdminPage('articles')"><i class="fas fa-newspaper"></i> Artikel</a></li>
+                    <li><a href="#" onclick="showAdminPage('reports')"><i class="fas fa-chart-bar"></i> Laporan</a></li>
+                    <li><a href="#" onclick="showAdminPage('settings')"><i class="fas fa-cog"></i> Pengaturan</a></li>
+                </ul>
+            </div>
+            
+            <div class="admin-content" id="adminContent">
+                <button class="btn btn-primary" onclick="toggleSidebar()" style="margin-bottom: 2rem;">
+                    <i class="fas fa-bars"></i> Menu
+                </button>
+                
+                <!-- Admin Dashboard -->
+                <div id="adminDashboard" class="admin-page">
+                    <h2>Dashboard Admin</h2>
+                    <div class="dashboard-cards">
+                        <div class="dashboard-card">
+                            <i class="fas fa-users" style="color: #3498db;"></i>
+                            <h3>1,234</h3>
+                            <p>Total User</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <i class="fas fa-clipboard-list" style="color: #27ae60;"></i>
+                            <h3>2,567</h3>
+                            <p>Total Konsultasi</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <i class="fas fa-virus" style="color: #e74c3c;"></i>
+                            <h3>Bronkitis</h3>
+                            <p>Penyakit Terbanyak</p>
+                        </div>
+                        <div class="dashboard-card">
+                            <i class="fas fa-chart-line" style="color: #f39c12;"></i>
+                            <h3>+15%</h3>
+                            <p>Peningkatan Bulan Ini</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Management -->
+                <div id="adminUsers" class="admin-page" style="display: none;">
+                    <h2>Manajemen User</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>John Doe</td>
+                                <td>john@example.com</td>
+                                <td>Aktif</td>
+                                <td>
+                                    <button class="btn btn-outline">Edit</button>
+                                    <button class="btn btn-primary">Blokir</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer style="background: linear-gradient(135deg, #2c3e50, #3498db); color: white; padding: 60px 0 20px; margin-top: 80px;">
+        <div class="container">
+            <div class="footer-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 3rem;">
+                
+                <!-- About Section -->
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 1rem;">
+                        <i class="fas fa-lungs" style="font-size: 2rem; color: #e74c3c;"></i>
+                        <h3 style="display: inline; margin-left: 10px;">SP-PAROK</h3>
+                    </div>
+                    <p style="margin-bottom: 1rem; line-height: 1.8;">Sistem Pakar Deteksi Penyakit Rokok menggunakan teknologi Forward Chaining untuk membantu deteksi dini penyakit akibat merokok.</p>
+                    <div class="social-media" style="display: flex; gap: 1rem;">
+                        <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" style="color: white; font-size: 1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4 style="margin-bottom: 1.5rem; color: #3498db;">Menu Utama</h4>
+                    <ul style="list-style: none; line-height: 2;">
+                        <li><a href="#" onclick="showPage('home')" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-home" style="width: 20px;"></i> Beranda
+                        </a></li>
+                        <li><a href="#" onclick="showPage('about')" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-info-circle" style="width: 20px;"></i> Tentang Sistem
+                        </a></li>
+                        <li><a href="#" onclick="startConsultation()" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-stethoscope" style="width: 20px;"></i> Konsultasi
+                        </a></li>
+                        <li><a href="#" onclick="showPage('articles')" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-newspaper" style="width: 20px;"></i> Artikel & Edukasi
+                        </a></li>
+                        <li><a href="#" onclick="showPage('faq')" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-question-circle" style="width: 20px;"></i> FAQ
+                        </a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="footer-section">
+                    <h4 style="margin-bottom: 1.5rem; color: #3498db;">Kontak Kami</h4>
+                    <div style="line-height: 2;">
+                        <p style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-envelope" style="width: 20px; color: #e74c3c;"></i> 
+                            support@sp-parok.com
+                        </p>
+                        <p style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-phone" style="width: 20px; color: #e74c3c;"></i> 
+                            (021) 1234-5678
+                        </p>
+                        <p style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-map-marker-alt" style="width: 20px; color: #e74c3c;"></i> 
+                            Jakarta, Indonesia
+                        </p>
+                        <p style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-clock" style="width: 20px; color: #e74c3c;"></i> 
+                            24/7 Online Support
+                        </p>
+                    </div>
+                    
+                    <button onclick="showPage('contact')" style="background: #e74c3c; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 25px; cursor: pointer; margin-top: 1rem; transition: background 0.3s;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">
+                        <i class="fas fa-paper-plane"></i> Hubungi Kami
+                    </button>
+                </div>
+
+                <!-- Health Links -->
+                <div class="footer-section">
+                    <h4 style="margin-bottom: 1.5rem; color: #3498db;">Kesehatan</h4>
+                    <ul style="list-style: none; line-height: 2;">
+                        <li><a href="https://www.who.int/health-topics/tobacco" target="_blank" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-external-link-alt" style="width: 20px;"></i> WHO - Tobacco
+                        </a></li>
+                        <li><a href="https://www.kemkes.go.id" target="_blank" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-external-link-alt" style="width: 20px;"></i> Kementerian Kesehatan
+                        </a></li>
+                        <li><a href="#" onclick="showPage('articles')" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-book-medical" style="width: 20px;"></i> Tips Berhenti Merokok
+                        </a></li>
+                        <li><a href="#" onclick="showPage('articles')" style="color: white; text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">
+                            <i class="fas fa-heartbeat" style="width: 20px;"></i> Pola Hidup Sehat
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Medical Disclaimer -->
+            <div style="background: rgba(0,0,0,0.2); padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                    <i class="fas fa-exclamation-triangle" style="color: #f39c12; font-size: 1.5rem; margin-top: 0.2rem;"></i>
+                    <div>
+                        <h5 style="color: #f39c12; margin-bottom: 0.5rem;">Disclaimer Medis</h5>
+                        <p style="line-height: 1.6; margin-bottom: 0;">
+                            SP-PAROK adalah sistem pakar untuk deteksi awal dan edukasi kesehatan. Hasil diagnosa tidak menggantikan konsultasi medis profesional. 
+                            Selalu konsultasikan kondisi kesehatan Anda dengan dokter atau tenaga medis yang kompeten. 
+                            Penggunaan sistem ini sepenuhnya merupakan tanggung jawab pengguna.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 2rem; text-align: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <p style="margin: 0;">&copy; 2024 SP-PAROK. All rights reserved.</p>
+                        <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">Dikembangkan dengan ❤️ untuk kesehatan masyarakat Indonesia</p>
+                    </div>
+                    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                        <a href="#" style="color: white; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">Privacy Policy</a>
+                        <a href="#" style="color: white; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">Terms of Service</a>
+                        <a href="#" onclick="checkAdminAccess()" style="color: white; text-decoration: none; font-size: 0.9rem; transition: color 0.3s;" onmouseover="this.style.color='#3498db'" onmouseout="this.style.color='white'">Admin Panel</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Bar -->
+            <div style="background: rgba(255,255,255,0.1); margin-top: 2rem; padding: 1.5rem; border-radius: 15px;">
+                <div style="display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h4 style="color: #e74c3c; margin: 0;">1,000+</h4>
+                        <p style="margin: 0; font-size: 0.9rem;">User Terdaftar</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #27ae60; margin: 0;">2,500+</h4>
+                        <p style="margin: 0; font-size: 0.9rem;">Konsultasi Selesai</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #3498db; margin: 0;">95%</h4>
+                        <p style="margin: 0; font-size: 0.9rem;">Tingkat Kepuasan</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #f39c12; margin: 0;">24/7</h4>
+                        <p style="margin: 0; font-size: 0.9rem;">Layanan Online</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Memproses analisis...</p>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let isLoggedIn = false;
+        let consultationResult = null;
+
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Authentication
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            showLoading(true);
+            
+            // Simulate login process
+            setTimeout(() => {
+                showLoading(false);
+                
+                // For demo purposes, accept any email/password
+                if (email && password) {
+                    currentUser = { name: email.split('@')[0], email: email };
+                    isLoggedIn = true;
+                    updateAuthUI();
+                    showNotification('Login berhasil!', 'success');
+                    showPage('home');
+                } else {
+                    showNotification('Email atau password salah!', 'error');
+                }
+            }, 2000);
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            showLoading(true);
+            
+            setTimeout(() => {
+                showLoading(false);
+                showNotification('Registrasi berhasil! Silakan login.', 'success');
+                showPage('login');
+            }, 2000);
+        }
+
+        function logout() {
+            currentUser = null;
+            isLoggedIn = false;
+            updateAuthUI();
+            showNotification('Logout berhasil!', 'info');
+            showPage('home');
+        }
+
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userName = document.getElementById('userName');
+            
+            if (isLoggedIn && currentUser) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userName.textContent = currentUser.name;
+            } else {
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        }
+
+        // Consultation
+        function startConsultation() {
+            if (!isLoggedIn) {
+                showNotification('Silakan login terlebih dahulu untuk memulai konsultasi.', 'info');
+                showPage('login');
+                return;
+            }
+            showPage('consultation');
+        }
+
+        function handleConsultation(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('consultName').value;
+            const age = document.getElementById('consultAge').value;
+            const smokingDuration = document.getElementById('smokingDuration').value || 0;
+            const cigarettesPerDay = document.getElementById('cigarettesPerDay').value || 0;
+            
+            // Get selected symptoms
+            const symptoms = [];
+            const checkboxes = document.querySelectorAll('input[name="symptoms"]:checked');
+            checkboxes.forEach(checkbox => symptoms.push(checkbox.value));
+            
+            if (symptoms.length === 0) {
+                showNotification('Pilih minimal satu gejala untuk melanjutkan analisis.', 'error');
+                return;
+            }
+            
+            showLoading(true);
+            
+            // Simulate expert system analysis
+            setTimeout(() => {
+                showLoading(false);
+                
+                const result = analyzeSymptoms(symptoms, smokingDuration, cigarettesPerDay);
+                consultationResult = {
+                    name: name,
+                    age: age,
+                    date: new Date().toLocaleDateString('id-ID'),
+                    symptoms: symptoms,
+                    result: result
+                };
+                
+                displayResult(consultationResult);
+                showPage('results');
+            }, 3000);
+        }
+
+        function analyzeSymptoms(symptoms, smokingDuration, cigarettesPerDay) {
+            // Simple rule-based analysis
+            let disease = '';
+            let probability = 0;
+            let recommendations = [];
+            
+            // Rule 1: Bronkitis Kronis
+            if (symptoms.includes('Batuk kronis') && symptoms.includes('Sesak napas')) {
+                disease = 'Bronkitis Kronis';
+                probability = 70 + (smokingDuration * 2) + (cigarettesPerDay * 1);
+                recommendations = [
+                    'Segera hentikan kebiasaan merokok',
+                    'Konsultasikan dengan dokter spesialis paru',
+                    'Hindari asap rokok dan polusi udara',
+                    'Perbanyak konsumsi air putih',
+                    'Olahraga ringan secara teratur'
+                ];
+            }
+            
+            // Rule 2: PPOK
+            if (symptoms.includes('Sesak napas') && symptoms.includes('Nafas berbunyi') && symptoms.includes('Mudah lelah')) {
+                disease = 'PPOK (Penyakit Paru Obstruktif Kronis)';
+                probability = 75 + (smokingDuration * 3) + (cigarettesPerDay * 2);
+                recommendations = [
+                    'Segera berhenti merokok total',
+                    'Konsultasi dengan dokter paru segera',
+                    'Gunakan masker saat keluar rumah',
+                    'Hindari aktivitas berat yang membuat sesak',
+                    'Konsumsi makanan bergizi tinggi'
+                ];
+            }
+            
+            // Rule 3: Kanker Paru (high risk)
+            if (symptoms.includes('Batuk darah') && symptoms.includes('Berat badan turun') && symptoms.includes('Nyeri dada')) {
+                disease = 'Kemungkinan Kanker Paru';
+                probability = 80 + (smokingDuration * 4) + (cigarettesPerDay * 3);
+                recommendations = [
+                    'SEGERA konsultasi dengan dokter onkologi',
+                    'Lakukan pemeriksaan CT scan paru',
+                    'Berhenti merokok sekarang juga',
+                    'Dukungan keluarga sangat penting',
+                    'Pertahankan pola makan sehat'
+                ];
+            }
+            
+            // Default case
+            if (!disease) {
+                disease = 'Gejala Ringan Akibat Rokok';
+                probability = 40 + (smokingDuration * 1) + (cigarettesPerDay * 0.5);
+                recommendations = [
+                    'Pertimbangkan untuk berhenti merokok',
+                    'Konsultasi dengan dokter umum',
+                    'Pola hidup sehat dengan olahraga teratur',
+                    'Konsumsi makanan bergizi seimbang',
+                    'Rutin check-up kesehatan'
+                ];
+            }
+            
+            probability = Math.min(probability, 95); // Cap at 95%
+            
+            return { disease, probability, recommendations };
+        }
+
+        function displayResult(result) {
+            document.getElementById('resultName').textContent = result.name;
+            document.getElementById('resultDate').textContent = `Tanggal: ${result.date}`;
+            document.getElementById('resultProbability').textContent = `${Math.round(result.result.probability)}%`;
+            document.getElementById('resultDisease').textContent = result.result.disease;
+            
+            const recommendationList = document.getElementById('recommendationList');
+            recommendationList.innerHTML = '<ul>' + 
+                result.result.recommendations.map(rec => `<li>${rec}</li>`).join('') + 
+                '</ul>';
+        }
+
+        // Admin functions
+        function showAdminPage(pageId) {
+            const adminPages = document.querySelectorAll('.admin-page');
+            adminPages.forEach(page => page.style.display = 'none');
+            document.getElementById(`admin${pageId.charAt(0).toUpperCase() + pageId.slice(1)}`).style.display = 'block';
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const content = document.getElementById('adminContent');
+            
+            sidebar.classList.toggle('active');
+            content.classList.toggle('sidebar-active');
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function printResult() {
+            if (consultationResult) {
+                const printContent = `
+                    HASIL KONSULTASI SP-PAROK
+                    ========================
+                    
+                    Nama: ${consultationResult.name}
+                    Tanggal: ${consultationResult.date}
+                    
+                    HASIL ANALISIS:
+                    ${consultationResult.result.disease} (${Math.round(consultationResult.result.probability)}%)
+                    
+                    GEJALA YANG DIALAMI:
+                    ${consultationResult.symptoms.map(s => `- ${s}`).join('\n')}
+                    
+                    REKOMENDASI:
+                    ${consultationResult.result.recommendations.map(r => `- ${r}`).join('\n')}
+                    
+                    ========================
+                    Disclaimer: Hasil ini hanya untuk deteksi awal. Konsultasikan dengan dokter untuk diagnosis yang akurat.
+                `;
+                
+                const printWindow = window.open('', '', 'height=600,width=800');
+                printWindow.document.write('<pre>' + printContent + '</pre>');
+                printWindow.document.close();
+                printWindow.print();
+            }
+        }
+
+        function saveToHistory() {
+            if (consultationResult) {
+                showNotification('Hasil konsultasi berhasil disimpan ke riwayat.', 'success');
+            }
+        }
+
+        function handleContact(event) {
+            event.preventDefault();
+            showNotification('Pesan Anda telah terkirim. Terima kasih!', 'success');
+            event.target.reset();
+        }
+
+        function showForgotPassword() {
+            showNotification('Fitur reset password akan segera tersedia.', 'info');
+        }
+
+        // Check if user is admin
+        function checkAdminAccess() {
+            // Simple admin check - in real app, this should be server-side
+            if (currentUser && currentUser.email === 'admin@sp-parok.com') {
+                showPage('admin');
+            } else {
+                showNotification('Akses admin diperlukan.', 'error');
+                showPage('login');
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for admin access in URL
+            if (window.location.hash === '#admin') {
+                checkAdminAccess();
+            }
+        });
+
+        // Handle admin menu toggle on mobile
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('adminSidebar').classList.remove('active');
+                document.getElementById('adminContent').classList.remove('sidebar-active');
+            }
+        });
+    </script>
+</body>
+</html>
